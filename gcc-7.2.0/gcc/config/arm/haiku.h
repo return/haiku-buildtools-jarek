@@ -97,3 +97,7 @@
   { "subtarget_extra_asm_spec",	SUBTARGET_EXTRA_ASM_SPEC },	\
   { "subtarget_asm_float_spec", SUBTARGET_ASM_FLOAT_SPEC }, 	\
   { "haiku_dynamic_linker", HAIKU_DYNAMIC_LINKER }
+
+/* We do not have any MULTILIB_OPTIONS specified, so there are no
+   MULTILIB_DEFAULTS.  */
+#undef  MULTILIB_DEFAULTS

@@ -233,7 +233,7 @@ case ${host} in
   ;;
 *-*-haiku*)
   tmake_file="$tmake_file t-crtstuff-pic t-libgcc-pic t-eh-dw2-dip t-slibgcc t-slibgcc-gld t-slibgcc-elf-ver t-slibgcc-nolc-override t-haiku"
-  extra_parts="crtbeginS.o crtendS.o"
+  extra_parts="crtbegin.o crtbeginS.o crtend.o crtendS.o"
   ;;
 *-*-linux* | frv-*-*linux* | *-*-kfreebsd*-gnu | *-*-gnu* | *-*-kopensolaris*-gnu)
   tmake_file="$tmake_file t-crtstuff-pic t-libgcc-pic t-eh-dw2-dip t-slibgcc t-slibgcc-gld t-slibgcc-elf-ver t-linux"

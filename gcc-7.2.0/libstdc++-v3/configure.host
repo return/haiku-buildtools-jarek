@@ -360,7 +360,7 @@ case "${host}" in
 	;;
     esac
     ;;
-  arm*-*-freebsd*)
+  arm*-*-freebsd* | arm*-*-haiku*)
      port_specific_symbol_files="\$(srcdir)/../config/os/gnu-linux/arm-eabi-extra.ver"
      ;;
   powerpc*-*-darwin*)
