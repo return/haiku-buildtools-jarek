@@ -76,6 +76,7 @@
   do                                          \
   {                                           \
       HAIKU_TARGET_OS_CPP_BUILTINS ();         \
+	builtin_define ("__AARCH64__");			\
   }                                           \
   while (false)
 
