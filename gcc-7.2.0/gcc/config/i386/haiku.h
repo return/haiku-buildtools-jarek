@@ -52,6 +52,7 @@ Boston, MA 02111-1307, USA.  */
   %{!shared: \
     %{!static: \
       %{rdynamic:-export-dynamic} \
+      -dynamic-linker " HAIKU_DYNAMIC_LINKER "} \
       %{static:-static}}"
 
 /* A C statement (sans semicolon) to output to the stdio stream
