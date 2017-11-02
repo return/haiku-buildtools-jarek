@@ -77,9 +77,19 @@
 
 /* If ELF is the default format, we should not use /lib/elf.  */
 
+#define SUBTARGET_EXTRA_LINK_SPEC " -m " TARGET_LINKER_EMULATION " -p"
+
 #undef	LINK_SPEC
-#define LINK_SPEC "%{!o*:-o %b} -m armelf %{!r:-shared} %{nostart:-e 0} %{shared:-e 0} %{!shared: %{!nostart: -no-undefined}}\
-  %{mbig-endian:-EB} %{mlittle-endian:-EL} -X"
+#define LINK_SPEC  "%{h*} \
+   %{static:-Bstatic} \
+   %{shared:-shared} \
+   %{symbolic:-Bsymbolic} \
+   %{!static: \
+     %{rdynamic:-export-dynamic} \
+     %{!shared:-dynamic-linker " HAIKU_DYNAMIC_LINKER "}} \
+   -X \
+   %{mbig-endian:-EB} %{mlittle-endian:-EL}" \
+   SUBTARGET_EXTRA_LINK_SPEC
 
 #undef SUBTARGET_ASM_FLOAT_SPEC
 #ifdef TARGET_FREEBSD_ARM_HARD_FLOAT

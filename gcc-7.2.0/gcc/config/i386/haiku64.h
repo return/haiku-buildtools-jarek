@@ -52,16 +52,37 @@ Boston, MA 02111-1307, USA.  */
    combinations of options at link-time.  */
 
 #if TARGET_64BIT_DEFAULT
-#define SPEC_32 "m32"
-#define SPEC_64 "!m32"
-#else
-#define SPEC_32 "!m64"
+#define SPEC_32 "m16|m32"
+#if TARGET_BI_ARCH == 2
 #define SPEC_64 "m64"
+#define SPEC_X32 "m16|m32|m64:;"
+#else
+#define SPEC_64 "m16|m32|mx32:;"
+#define SPEC_X32 "mx32"
+#endif
+#else
+#define SPEC_32 "m64|mx32:;"
+#define SPEC_64 "m64"
+#define SPEC_X32 "mx32"
 #endif
 
+#define HAIKU_LINK_EMULATION32 "elf_i386_haiku"
+#define HAIKU_LINK_EMULATION64 "elf_x86_64_haiku"
+#define HAIKU_LINK_EMULATIONX32 "elf32_x86_64"
+
 #undef	LINK_SPEC
-#define LINK_SPEC "%{" SPEC_64 ":-m elf_x86_64_haiku} %{" SPEC_32 ":-m elf_i386_haiku} \
-	%{!r:-shared} %{nostart:-e 0} %{shared:-e 0} %{!shared: %{!nostart: -no-undefined}}"
+#define LINK_SPEC 				   \
+                  "%{" SPEC_64 ":-m " HAIKU_LINK_EMULATION64 "} \
+                   %{" SPEC_32 ":-m " HAIKU_LINK_EMULATION32 "} \
+                   %{" SPEC_X32 ":-m " HAIKU_LINK_EMULATIONX32 "} \
+  %{shared:-shared} \
+  %{!shared: \
+    %{!static: \
+      %{rdynamic:-export-dynamic} \
+      %{" SPEC_32 ":-dynamic-linker " HAIKU_DYNAMIC_LINKER "} \
+      %{" SPEC_64 ":-dynamic-linker " HAIKU_DYNAMIC_LINKER "} \
+      %{" SPEC_X32 ":-dynamic-linker " HAIKU_DYNAMIC_LINKER "}} \
+    %{static:-static}}"
 
 /* A C statement (sans semicolon) to output to the stdio stream
    FILE the assembler definition of uninitialized global DECL named
@@ -105,8 +126,10 @@ Boston, MA 02111-1307, USA.  */
 #define NO_PROFILE_COUNTERS 1
 
 #undef ASM_SPEC
-#define ASM_SPEC "%{v:-V} %{Qy:} %{!Qn:-Qy} %{n} %{T} %{Ym,*} %{Yd,*} \
- %{Wa,*:%*} %{" SPEC_32 ":--32} %{" SPEC_64 ":--64}"
+#define ASM_SPEC "%{" SPEC_32 ":--32} \
+ %{" SPEC_64 ":--64} \
+ %{" SPEC_X32 ":--x32} \
+ %{!mno-sse2avx:%{mavx:-msse2avx}} %{msse2avx:%{!mavx:-msse2avx}}"
 
 #undef  ASM_OUTPUT_ALIGNED_COMMON
 #define ASM_OUTPUT_ALIGNED_COMMON(FILE, NAME, SIZE, ALIGN)		\
