@@ -136,6 +136,7 @@ ExternalProject_Add(binutils
 						--prefix=${HAIKU_TOOLCHAIN_INSTALL_PREFIX} 
 						--disable-nls 
 						--target=${HAIKU_TRIPLET}
+						--with-sysroot=${HAIKU_SYSROOT}
 	BUILD_COMMAND make ${PROJ_BUILD_EXTRA_ARGS}
 	INSTALL_COMMAND make install)
 
