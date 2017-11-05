@@ -76,7 +76,7 @@ ELSE()
 	SET(HAIKU_ARCH "$ENV{HAIKU_ARCH}" CACHE STRING "")
 ENDIF()
 
-MESSAGE(STATUS "Building cross tools for architecture ${HARDINFO_ARCH}")
+MESSAGE(STATUS "Building cross tools for architecture ${HAIKU_ARCH}")
 
 IF("${HAIKU_ARCH}" STREQUAL "x86")
 	SET(HAIKU_TRIPLET	"i586-pc-haiku" CACHE STRING "")
