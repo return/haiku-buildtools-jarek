@@ -216,3 +216,7 @@ Boston, MA 02111-1307, USA.  */
 
 /* Do not use TM clone registry in Haiku for now */
 #define USE_TM_CLONE_REGISTRY 0
+
+/* Always want PIE */
+#undef LINK_PIE_SPEC
+#define LINK_PIE_SPEC		"%{static|shared|r:;!no-pie:-pie -z now}"
