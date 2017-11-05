@@ -1,5 +1,7 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
-PROJECT(haiku-buildtools)
+IF("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_CURRENT_SOURCE_DIR}")
+	CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
+	PROJECT(haiku-buildtools)
+ENDIF()
 
 include(GNUInstallDirs)
 
@@ -78,49 +80,42 @@ ENDIF()
 
 MESSAGE(STATUS "Building cross tools for architecture ${HAIKU_ARCH}")
 
-IF("${HAIKU_ARCH}" STREQUAL "x86")
-	SET(HAIKU_TRIPLET	"i586-pc-haiku" CACHE STRING "")
-ELSEIF("${HAIKU_ARCH}" STREQUAL "x86_64")
-	SET(HAIKU_TRIPLET	"x86_64-unknown-haiku" CACHE STRING "")
-ELSEIF("${HAIKU_ARCH}" STREQUAL "ppc")
-	SET(HAIKU_TRIPLET	"powerpc-apple-haiku" CACHE STRING "")
-ELSEIF("${HAIKU_ARCH}" STREQUAL "m68k")
-	SET(HAIKU_TRIPLET	"m68k-unknown-haiku" CACHE STRING "")
-ELSEIF("${HAIKU_ARCH}" STREQUAL "arm")
-	SET(HAIKU_TRIPLET	"arm-elf-haiku" CACHE STRING "")
-ELSEIF("${HAIKU_ARCH}" STREQUAL "mips")
-	SET(HAIKU_TRIPLET	"mipsel-unknown-haiku" CACHE STRING "")
-ELSEIF("${HAIKU_ARCH}" STREQUAL "aarch64")
-	SET(HAIKU_TRIPLET	"aarch64-elf-haiku" CACHE STRING "")
-ELSE()
-	MESSAGE(FATAL_ERROR "Target architecture not supported")
+include(${HAIKU_SOURCE_DIR}/build/cmake/ToolchainTriple.cmake)
+
+GetHaikuToolchainTriple(${HAIKU_ARCH} HAIKU_TRIPLET)
+
+IF("${HAIKU_SYSROOT}" STREQUAL "")
+	SET(HAIKU_SYSROOT		"${CMAKE_CURRENT_BINARY_DIR}/sysroot")
 ENDIF()
 
-SET(HAIKU_SYSROOT		"${CMAKE_CURRENT_BINARY_DIR}/sysroot")
 SET(HAIKU_INCLUDE_DIR	"${HAIKU_SYSROOT}/boot/system/develop/headers")
 SET(HAIKU_LIB_DIR		"${HAIKU_SYSROOT}/boot/system/develop/lib")
 
-function(sysroot_configure_files srcDir destDir)
-    file(MAKE_DIRECTORY ${destDir})
+IF("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_CURRENT_SOURCE_DIR}")
+	# On embedded build, sysroot is already there
 
-    file(GLOB templateFiles RELATIVE ${srcDir} ${srcDir}/*)
-    
-    foreach(templateFile ${templateFiles})
-        set(srcTemplatePath ${srcDir}/${templateFile})
-        if(NOT IS_DIRECTORY ${srcTemplatePath})
-            configure_file(
-                    ${srcTemplatePath}
-                    ${destDir}/${templateFile}
-                    COPYONLY)
-        else()
-        	sysroot_configure_files(${srcDir}/${templateFile} ${destDir}/${templateFile})
-        endif(NOT IS_DIRECTORY ${srcTemplatePath})
-    endforeach(templateFile)
-endfunction(sysroot_configure_files)
-
-sysroot_configure_files(${HAIKU_SOURCE_DIR}/headers/config ${HAIKU_INCLUDE_DIR}/config)
-sysroot_configure_files(${HAIKU_SOURCE_DIR}/headers/os ${HAIKU_INCLUDE_DIR}/os)
-sysroot_configure_files(${HAIKU_SOURCE_DIR}/headers/posix ${HAIKU_INCLUDE_DIR}/posix)
+	function(sysroot_configure_files srcDir destDir)
+	    file(MAKE_DIRECTORY ${destDir})
+	
+	    file(GLOB templateFiles RELATIVE ${srcDir} ${srcDir}/*)
+	    
+	    foreach(templateFile ${templateFiles})
+	        set(srcTemplatePath ${srcDir}/${templateFile})
+	        if(NOT IS_DIRECTORY ${srcTemplatePath})
+	            configure_file(
+	                    ${srcTemplatePath}
+	                    ${destDir}/${templateFile}
+	                    COPYONLY)
+	        else()
+	        	sysroot_configure_files(${srcDir}/${templateFile} ${destDir}/${templateFile})
+	        endif(NOT IS_DIRECTORY ${srcTemplatePath})
+	    endforeach(templateFile)
+	endfunction(sysroot_configure_files)
+	
+	sysroot_configure_files(${HAIKU_SOURCE_DIR}/headers/config ${HAIKU_INCLUDE_DIR}/config)
+	sysroot_configure_files(${HAIKU_SOURCE_DIR}/headers/os ${HAIKU_INCLUDE_DIR}/os)
+	sysroot_configure_files(${HAIKU_SOURCE_DIR}/headers/posix ${HAIKU_INCLUDE_DIR}/posix)
+ENDIF()
 
 include(ExternalProject)
 include(ProcessorCount)
